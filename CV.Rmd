@@ -1,0 +1,75 @@
+---
+name: Peter Finnerty
+date: "`r format(Sys.time(), '%B, %Y')`"
+qualifications: MSc, BSc
+address: 65c Bartholomew Rd, London
+phone: +44 7570 479166
+email: peter.t.finnerty@gmail.com
+website: peterfinnerty.me
+linkedin: ptfinnerty
+twitter: peter_finnerty
+headcolor: 414141
+output: vitae::awesomecv
+title: "CV"
+type: "page"
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(vitae)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Education
+```{r}
+tribble(
+  ~ degree, ~ uni, ~ loc, ~ dates, ~ details,
+  "MSc in Development Studies", "London School of Economics", "London, UK", "Aug. 2018 - Aug. 2019", "Thesis: 'Credit Scoring in Kenyan Digital Financial Services'",
+  "MSc in Development Studies", "London School of Economics", "London, UK", "Aug. 2018 - Aug. 2019", "Authored and presented report for UNDP: 'Cooperative Entrepreneurship for Syrians and Host Communities'",
+  "BSc in Finance and Information Systems", "Boston College", "Boston, MA", "Aug. 2013 - May 2017", "GPA of 3.750, Magna Cum Laude",
+  "BSc in Finance and Information Systems", "Boston College", "Boston, MA", "Aug. 2013 - May 2017", "4Boston Council, Geology Club Treasurer, Alpha Sigma Nu Honor Society",
+  "BSc in Finance and Information Systems", "Boston College", "Boston, MA", "Aug. 2013 - May 2017", "Social Eyes Journal Publication: 'Student Debt in America:Differences in Media and Theory'"
+) %>% 
+  detailed_entries(degree, dates, uni, loc, details)
+```
+
+# Experience
+```{r}
+tribble(
+  ~ role, ~ dates, ~ company, ~ loc, ~ details,
+  "Analyst, ICG Analytics", "Jun. 2017 - Aug. 2018", "Citigroup", "New York, NY", "Led analysis of Citi’s financial technology investments, aligning investments with emerging trends",
+  "Analyst, ICG Analytics", "Jun. 2017 - Aug. 2018", "Citigroup", "New York, NY", "Created R tools to automate analysis and reporting of RoBC and client coverage",
+  "Analyst, ICG Analytics", "Jun. 2017 - Aug. 2018", "Citigroup", "New York, NY", "Implemented and taught R for statistical consulting team",
+  "Analyst, ICG Analytics", "Jun. 2017 - Aug. 2018", "Citigroup", "New York, NY", "Developed Excel models to project banking revenue for VC funded clients and identify problematic coverage",
+  "Portfolio Intern", "Jun. 2016 - Aug. 2016", "Silvercrest Assest Management", "New York, NY", "Led the transfer of a remote team's fund and investor data into a centralized database",
+  "Portfolio Intern", "Jun. 2016 - Aug. 2016", "Silvercrest Assest Management", "New York, NY", "Created VBA tools to aggregate historical fund data and track portfolio performance",
+  "Portfolio Intern", "Jun. 2016 - Aug. 2016", "Silvercrest Assest Management", "New York, NY", "Analyzed returns from proprietary trading strategies and stock screening protocols",
+  "Teaching Assistant", "Sept. 2015 - Aug. 2017", "Boston College", "Boston, MA", "Led biweekly discussions on classic philosophy and theology",
+  "Teaching Assistant", "Sept. 2015 - Aug. 2017", "Boston College", "Boston, MA", "Assisted freshmen in the transition to college through individual mentoring",
+    "Analytics Intern", "Jun. 2015 - Aug. 2015", "Billtrust", "Hamilton, NJ", "Analyzed marketing emails to maximize open rates and train sales teams",
+  "Analytics Intern", "Jun. 2015 - Aug. 2015", "Billtrust", "Hamilton, NJ", "Presented data-driven recommendations to improve marketing spend"
+) %>%
+  detailed_entries(role, dates, company, loc, details)
+```
+
+# Volunteering
+```{r}
+tribble(
+  ~ position, ~org, ~ loc, ~ dates, ~ details,
+  "Service Leader and Volunteer", "Women's Lunch Place", "Boston, MA", "Sep. 2013 - May 2017", "Worked as a kitchen aid for four hours every week from Freshman to Senior year",
+  "Service Leader and Volunteer", "Women's Lunch Place", "Boston, MA", "Sep. 2013 - May 2017", "Coordinated schedules for 14 volunteers and led weekly reflection meetings",
+  "Service Leader and Volunteer", "Women's Lunch Place", "Boston, MA", "Sep. 2013 - May 2017", "Lead speaker for 400+ person Spring conference",
+  "Reflection Coordinator and Volunteer", "Learn to Serve", "Boston, MA", "Sep. 2013 - May. 2015", "Taught SAT and ACT prep to high schoolers and worked on job skills with new immigrants",
+  "Reflection Coordinator and Volunteer", "Learn to Serve", "Boston, MA", "Sep. 2013 - May. 2015", "Organised group activites centered on increasing volunteer impact"
+) %>% 
+  detailed_entries(position, org, loc, dates, details)
+```
+
+# Relevant Skills
+
+**Programming:** R, SQL, VBA, Python (basic)
+
+**Data Analysis:** Visualization, Data Cleaning, Linear Regression, Decision Trees, SVM, Web Scraping
+
+**Other Tools:** Excel (Macros, PivotTables), Tableau
+

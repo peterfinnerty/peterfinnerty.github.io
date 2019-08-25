@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Peter Finnerty</title>
+    <link>/</link>
+    <description>Recent content on Peter Finnerty</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 25 Aug 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Oxford MPI Data</title>
+      <link>/post/exploring-oxford-mpi-data/</link>
+      <pubDate>Sun, 25 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/exploring-oxford-mpi-data/</guid>
+      <description>MPI Background MPI scores represent the best operationalized non-income based approach to measuring poverty. It measures acute poverty, including those who are poor due to absolute deprivation in one necessity and those who experience multiple forms of deprivation that result in poverty. This approach captures the spirit of Amartya Sen’s idea of shifting from income-based poverty metrics to a capabilities understanding of poverty and deprivation. For an overview of the issues with income-based poverty metrics and the importance of other measures, see Laderchi, Saith, and Stewart (2003).</description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>/about/</link>
+      <pubDate>Sat, 24 Aug 2019 19:26:55 +0100</pubDate>
+      
+      <guid>/about/</guid>
+      <description>Hello there, I&amp;rsquo;m Peter Finnerty. Check out my CV and letters of recommendation!
+I&amp;rsquo;m a recent graduate of LSE&amp;rsquo;s MSc programme in Development Studies. I&amp;rsquo;ve spent the past year studying financial technology in devleoping countries, with specific emphasis on user experience with digital credit applications. I&amp;rsquo;m currently looking for a role in product analytics for a startup where I can dig into data to improve user experience.
+I previously worked at Citigroup as an analyst with ICG Analytics, a statistical consulting division of the Investment and Corporate Banks.</description>
+    </item>
+    
+    <item>
+      <title>CV</title>
+      <link>/cv/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/cv/</guid>
+      <description> Education  Experience  Volunteering  Relevant Skills Programming: R, SQL, VBA, Python (basic)
+Data Analysis: Visualization, Data Cleaning, Linear Regression, Decision Trees, SVM, Web Scraping
+Other Tools: Excel (Macros, PivotTables), Tableau
+ </description>
+    </item>
+    
+  </channel>
+</rss>

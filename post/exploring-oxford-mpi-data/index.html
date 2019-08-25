@@ -1,0 +1,3170 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Oxford MPI Data - Peter Finnerty</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:title" content="Oxford MPI Data" />
+<meta property="og:description" content="Exploring Multidimensional Poverty Index data using Tidyverse and ggplot2." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/post/exploring-oxford-mpi-data/" />
+<meta property="article:published_time" content="2019-08-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-08-25T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Oxford MPI Data"/>
+<meta name="twitter:description" content="Exploring Multidimensional Poverty Index data using Tidyverse and ggplot2."/>
+<link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,300italic,400italic|Raleway:500,100,300" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/main.css" /><script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script><script src="/js/main.js"></script>
+</head>
+
+<body>
+	<div class="container wrapper post">
+		<div class="header">
+	<h1 class="site-title">Peter Finnerty</h1>
+	<div class="site-description"><h2>Data, startups, and thoughts</h2><nav class="nav social">
+			<ul class="flat"><a href="https://www.linkedin.com/in/ptfinnerty/" title="LinkedIn"><i data-feather="linkedin"></i></a><a href="https://twitter.com/peter_finnerty" title="Twitter"><i data-feather="twitter"></i></a></ul>
+		</nav>
+	</div>
+
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/about">About</a>
+			</li>
+			
+		</ul>
+	</nav>
+</div>
+
+
+		<div class="post-header">
+			<h1 class="title">Oxford MPI Data</h1>
+			<div class="meta">Posted at &mdash; Aug 25, 2019</div>
+		</div>
+
+		<div class="markdown">
+			
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
+<link href="/rmarkdown-libs/bsTable/bootstrapTable.min.css" rel="stylesheet" />
+
+
+<div id="mpi-background" class="section level3">
+<h3>MPI Background</h3>
+MPI scores represent the best operationalized non-income based approach to measuring poverty. It measures acute poverty, including those who are poor due to absolute deprivation in one necessity and those who experience multiple forms of deprivation that result in poverty. This approach captures the spirit of Amartya Sen’s idea of shifting from income-based poverty metrics to a capabilities understanding of poverty and deprivation. For an overview of the issues with income-based poverty metrics and the importance of other measures, see Laderchi, Saith, and Stewart <a href="https://www.ophi.org.uk/wp-content/uploads/ssRuggeri-Laderchi-Saith-Stewart-2003.pdf">(2003)</a>. <br> MPIs measure both incidence and intensity of poverty, combining these measurements to understand severity of poverty in an area. MPI scores are calculated by measuring the incidence and intensity of ten indicators of poverty:
+<div class="figure" style="text-align: center"><span id="fig:pressure"></span>
+<img src="/img/Indicators.jpg" alt="MPI Dimensions of Poverty" width="75%" />
+<p class="caption">
+Figure 1: MPI Dimensions of Poverty
+</p>
+</div>
+<p><br> This methodology allows inter- and intracountry comparisons of the intensity of poverty, capturing more information than simple PPP thresholds. See OPI’s <a href="https://www.ophi.org.uk/wp-content/uploads/MPI-Primer1.pdf">explanation</a> for further detail.</p>
+<p><br></p>
+</div>
+<div id="data-exploration" class="section level3">
+<h3>Data Exploration</h3>
+<p>First, let’s load our packages.</p>
+<pre class="r"><code>library(ggplot2)
+library(tidyverse)
+library(kableExtra)
+library(ggthemes)</code></pre>
+<p>Now, let’s load the Oxford Multidimensional Poverty Data sets</p>
+<pre class="r"><code>national &lt;- read_csv(&#39;MPI_national.csv&#39;)
+subnational &lt;- read_csv(&#39;MPI_subnational.csv&#39;)</code></pre>
+<p>Here are the ten countries with the lowest MPIs in rural areas. <br></p>
+<pre class="r"><code>national %&gt;% 
+  mutate(Rural_Rank = min_rank(-MPI_Rural)) %&gt;% 
+  dplyr::select(Rural_Rank, Country, MPI_Rural) %&gt;%
+  arrange(desc(MPI_Rural)) %&gt;% 
+  head(10) %&gt;% 
+  kable() %&gt;% 
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = TRUE,
+                position = &quot;center&quot;)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+Rural_Rank
+</th>
+<th style="text-align:left;">
+Country
+</th>
+<th style="text-align:right;">
+MPI_Rural
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Niger
+</td>
+<td style="text-align:right;">
+0.669
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Somalia
+</td>
+<td style="text-align:right;">
+0.651
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Ethiopia
+</td>
+<td style="text-align:right;">
+0.637
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+Burkina Faso
+</td>
+<td style="text-align:right;">
+0.621
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+Chad
+</td>
+<td style="text-align:right;">
+0.609
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+Guinea
+</td>
+<td style="text-align:right;">
+0.591
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+South Sudan
+</td>
+<td style="text-align:right;">
+0.591
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;">
+Sierra Leone
+</td>
+<td style="text-align:right;">
+0.551
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+Mali
+</td>
+<td style="text-align:right;">
+0.530
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+Central African Republic
+</td>
+<td style="text-align:right;">
+0.519
+</td>
+</tr>
+</tbody>
+</table>
+<p><br> Here are the ten countries with the lowest MPIs in urban areas. <br></p>
+<pre class="r"><code>national %&gt;% 
+  mutate(Rural_Rank = min_rank(-MPI_Urban)) %&gt;% 
+  dplyr::select(Rural_Rank, Country, MPI_Urban) %&gt;%
+  arrange(desc(MPI_Urban)) %&gt;% 
+  head(10) %&gt;% 
+  kable() %&gt;% 
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = TRUE, position = &quot;center&quot;)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+Rural_Rank
+</th>
+<th style="text-align:left;">
+Country
+</th>
+<th style="text-align:right;">
+MPI_Urban
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+South Sudan
+</td>
+<td style="text-align:right;">
+0.459
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Chad
+</td>
+<td style="text-align:right;">
+0.351
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Somalia
+</td>
+<td style="text-align:right;">
+0.293
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+Liberia
+</td>
+<td style="text-align:right;">
+0.290
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+Central African Republic
+</td>
+<td style="text-align:right;">
+0.289
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+Niger
+</td>
+<td style="text-align:right;">
+0.276
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:left;">
+Sierra Leone
+</td>
+<td style="text-align:right;">
+0.271
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;">
+Ethiopia
+</td>
+<td style="text-align:right;">
+0.230
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+Congo, Democratic Republic of the
+</td>
+<td style="text-align:right;">
+0.228
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+Burkina Faso
+</td>
+<td style="text-align:right;">
+0.226
+</td>
+</tr>
+</tbody>
+</table>
+<p><br> Unsurprisingly, both of these lists are dominated by countries in SSA. To compare SSA to the rest of the world, we graph the average MPIs of all regions below. <br></p>
+<pre class="r"><code>subnational %&gt;% 
+  group_by(World_region) %&gt;% 
+  summarize(Avg.MPI = round(mean(MPI_Regional), 2)) %&gt;% 
+  ggplot(mapping = aes(x = reorder(World_region, -Avg.MPI), y = Avg.MPI, fill = Avg.MPI)) +
+  geom_bar(stat = &#39;identity&#39;) +
+  theme_economist() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), axis.title.x=element_blank(), legend.position = &#39;none&#39;)</code></pre>
+<p><img src="/post/2019-08-25-exploring-oxford-mpi-data_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /> <br> It’s clear that SSA is far-and-away the most impoverished region. However, South Asia also stands out above the other regions. <br><br> Now we’ll look at countries with the worst intra-country regional differences. Here, we’re interested in looking within countries to identify those who have severe income inequality. To do so we use sub-national data to find the difference between the highest and lowest MPIs within a country. <br></p>
+<pre class="r"><code>max &lt;- subnational %&gt;% 
+  group_by(Country) %&gt;%
+  filter(MPI_Regional == max(MPI_Regional)) %&gt;%
+  dplyr::select(ISO_country_code, Country, Sub_national_region, MPI_Regional, MPI_National) %&gt;% 
+  rename(Highest_Region = Sub_national_region, Highest_MPI = MPI_Regional)
+min &lt;- subnational %&gt;% 
+  group_by(Country) %&gt;%
+  filter(MPI_Regional == min(MPI_Regional)) %&gt;%
+  dplyr::select(ISO_country_code, Country, Sub_national_region, MPI_Regional, MPI_National) %&gt;% 
+  rename(Lowest_Region = Sub_national_region, Lowest_MPI = MPI_Regional)
+gaps &lt;- merge(max, min) %&gt;% 
+  mutate(MPI_Gap = Highest_MPI - Lowest_MPI)
+
+gaps %&gt;%
+  mutate(Rank = min_rank(-MPI_Gap)) %&gt;% 
+  dplyr::select(Rank, Country, Highest_Region, Lowest_Region, MPI_Gap) %&gt;%
+  arrange(Rank) %&gt;% 
+  head(10) %&gt;% 
+  kable() %&gt;% 
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), 
+                full_width = TRUE, position = &quot;left&quot;)</code></pre>
+<table class="table table-striped table-hover table-condensed" style>
+<thead>
+<tr>
+<th style="text-align:right;">
+Rank
+</th>
+<th style="text-align:left;">
+Country
+</th>
+<th style="text-align:left;">
+Highest_Region
+</th>
+<th style="text-align:left;">
+Lowest_Region
+</th>
+<th style="text-align:right;">
+MPI_Gap
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Nigeria
+</td>
+<td style="text-align:left;">
+Yobe
+</td>
+<td style="text-align:left;">
+Lagos
+</td>
+<td style="text-align:right;">
+0.600
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Ethiopia
+</td>
+<td style="text-align:left;">
+Affar
+</td>
+<td style="text-align:left;">
+Addis Ababa
+</td>
+<td style="text-align:right;">
+0.578
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Uganda
+</td>
+<td style="text-align:left;">
+Karamoja
+</td>
+<td style="text-align:left;">
+Kampala
+</td>
+<td style="text-align:right;">
+0.558
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+Cameroon
+</td>
+<td style="text-align:left;">
+Extrðme-Nord
+</td>
+<td style="text-align:left;">
+Douala
+</td>
+<td style="text-align:right;">
+0.516
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+Afghanistan
+</td>
+<td style="text-align:left;">
+Urozgan
+</td>
+<td style="text-align:left;">
+Kabul
+</td>
+<td style="text-align:right;">
+0.507
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+Burkina Faso
+</td>
+<td style="text-align:left;">
+Est
+</td>
+<td style="text-align:left;">
+Centre
+</td>
+<td style="text-align:right;">
+0.491
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:left;">
+Kenya
+</td>
+<td style="text-align:left;">
+North Eastern
+</td>
+<td style="text-align:left;">
+Nairobi
+</td>
+<td style="text-align:right;">
+0.489
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;">
+Chad
+</td>
+<td style="text-align:left;">
+Lac
+</td>
+<td style="text-align:left;">
+N’DjamðNa
+</td>
+<td style="text-align:right;">
+0.487
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+Mozambique
+</td>
+<td style="text-align:left;">
+Zambðzia
+</td>
+<td style="text-align:left;">
+Maputo Cidade
+</td>
+<td style="text-align:right;">
+0.485
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+Guinea
+</td>
+<td style="text-align:left;">
+Kankan
+</td>
+<td style="text-align:left;">
+Conakry
+</td>
+<td style="text-align:right;">
+0.481
+</td>
+</tr>
+</tbody>
+</table>
+<p><br> Again, SSA dominates this list. <br><br> Now let’s look add more country level information. To do so, we will load in the 2014 World Bank Development Indicators and merge them with the MPI data set. <br></p>
+<pre class="r"><code>/Users/peterfinnerty/Documents/Data Science/Oxford Poverty/
+Country_data &lt;- read.csv(&#39;WDICountry.csv&#39;)
+WDI &lt;- read.csv(&#39;2014_WDI_Clean.csv&#39;)
+df &lt;- merge(gaps, WDI, by = &#39;ISO_country_code&#39;)</code></pre>
+<p><br> First, we’ll look at the relationship between a country’s MPI and its GNI per capital. <br></p>
+<pre class="r"><code>df %&gt;% 
+  ggplot(aes(x = MPI_National, y = GNI_Per_Capita_PPP)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  theme_economist()</code></pre>
+<p><img src="/post/2019-08-25-exploring-oxford-mpi-data_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /> <br><br> Unsurprisingly, countries with higher incomes have lower average MPI Scores. However, this relationship is hard to see due to outliers. Let’s look at just countries with GNIs less than $10,000 PPP. <br></p>
+<pre class="r"><code>df %&gt;%
+  filter(GNI_Per_Capita_PPP &lt; 10000) %&gt;%
+  ggplot(aes(x = MPI_National, y = GNI_Per_Capita_PPP)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  theme_economist()</code></pre>
+<p><img src="/post/2019-08-25-exploring-oxford-mpi-data_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /> <br> It’s clear there’s a negative relationship, but the variation at the tail is interesting. It seems like countries with MPIs over 0.4 often have GNIs per capita that are higher than countries experiencing lower levels of poverty. <br><br> Let’s explore that a bit. Here is a list of counties with MPIs above 0.4 or whose highest sub-national MPI was above 0.4. This list is ranked by GNIs per capita. <br></p>
+<pre class="r"><code>df %&gt;% 
+  drop_na(GNI_Per_Capita_PPP) %&gt;% 
+  filter(MPI_National &gt; .4 | Highest_MPI &gt; .4) %&gt;% 
+  mutate(Rank = min_rank(-GNI_Per_Capita_PPP)) %&gt;% 
+  arrange(desc(GNI_Per_Capita_PPP)) %&gt;% 
+  dplyr::select(Rank, Country, GNI_Per_Capita_PPP, MPI_Gap, MPI_National, 
+         Infant_Mortality_per_1000, Life_Expectancy) %&gt;% 
+  kable() %&gt;% 
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = TRUE,
+                position = &quot;center&quot;, font_size = 10) %&gt;% 
+  scroll_box(height = &quot;250px&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:250px; ">
+<table class="table table-striped table-hover table-condensed" style="font-size: 10px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Rank
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Country
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+GNI_Per_Capita_PPP
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+MPI_Gap
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+MPI_National
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Infant_Mortality_per_1000
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Life_Expectancy
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Nigeria
+</td>
+<td style="text-align:right;">
+5472.25178
+</td>
+<td style="text-align:right;">
+0.600
+</td>
+<td style="text-align:right;">
+0.303
+</td>
+<td style="text-align:right;">
+71.5
+</td>
+<td style="text-align:right;">
+52.754268
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Pakistan
+</td>
+<td style="text-align:right;">
+4831.75825
+</td>
+<td style="text-align:right;">
+0.363
+</td>
+<td style="text-align:right;">
+0.230
+</td>
+<td style="text-align:right;">
+67.4
+</td>
+<td style="text-align:right;">
+66.183366
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Sudan
+</td>
+<td style="text-align:right;">
+3823.91354
+</td>
+<td style="text-align:right;">
+0.454
+</td>
+<td style="text-align:right;">
+0.287
+</td>
+<td style="text-align:right;">
+48.8
+</td>
+<td style="text-align:right;">
+63.458537
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+Mauritania
+</td>
+<td style="text-align:right;">
+3589.95719
+</td>
+<td style="text-align:right;">
+0.460
+</td>
+<td style="text-align:right;">
+0.285
+</td>
+<td style="text-align:right;">
+66.1
+</td>
+<td style="text-align:right;">
+63.165854
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+Cote d’Ivoire
+</td>
+<td style="text-align:right;">
+2976.74390
+</td>
+<td style="text-align:right;">
+0.409
+</td>
+<td style="text-align:right;">
+0.310
+</td>
+<td style="text-align:right;">
+68.5
+</td>
+<td style="text-align:right;">
+51.559585
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+Cameroon
+</td>
+<td style="text-align:right;">
+2877.33112
+</td>
+<td style="text-align:right;">
+0.516
+</td>
+<td style="text-align:right;">
+0.248
+</td>
+<td style="text-align:right;">
+58.6
+</td>
+<td style="text-align:right;">
+55.492756
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:left;">
+Kenya
+</td>
+<td style="text-align:right;">
+2714.75258
+</td>
+<td style="text-align:right;">
+0.489
+</td>
+<td style="text-align:right;">
+0.187
+</td>
+<td style="text-align:right;">
+36.6
+</td>
+<td style="text-align:right;">
+61.576366
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;">
+Senegal
+</td>
+<td style="text-align:right;">
+2166.28639
+</td>
+<td style="text-align:right;">
+0.293
+</td>
+<td style="text-align:right;">
+0.331
+</td>
+<td style="text-align:right;">
+42.3
+</td>
+<td style="text-align:right;">
+66.372585
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+South Sudan
+</td>
+<td style="text-align:right;">
+2113.52174
+</td>
+<td style="text-align:right;">
+0.270
+</td>
+<td style="text-align:right;">
+0.557
+</td>
+<td style="text-align:right;">
+62.0
+</td>
+<td style="text-align:right;">
+55.682220
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+Benin
+</td>
+<td style="text-align:right;">
+1987.97114
+</td>
+<td style="text-align:right;">
+0.445
+</td>
+<td style="text-align:right;">
+0.307
+</td>
+<td style="text-align:right;">
+65.7
+</td>
+<td style="text-align:right;">
+59.515854
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:left;">
+Chad
+</td>
+<td style="text-align:right;">
+1984.47824
+</td>
+<td style="text-align:right;">
+0.487
+</td>
+<td style="text-align:right;">
+0.552
+</td>
+<td style="text-align:right;">
+86.7
+</td>
+<td style="text-align:right;">
+51.555849
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:left;">
+Mali
+</td>
+<td style="text-align:right;">
+1816.68736
+</td>
+<td style="text-align:right;">
+0.426
+</td>
+<td style="text-align:right;">
+0.457
+</td>
+<td style="text-align:right;">
+75.9
+</td>
+<td style="text-align:right;">
+57.986268
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:left;">
+Sierra Leone
+</td>
+<td style="text-align:right;">
+1658.27824
+</td>
+<td style="text-align:right;">
+0.410
+</td>
+<td style="text-align:right;">
+0.464
+</td>
+<td style="text-align:right;">
+9.2
+</td>
+<td style="text-align:right;">
+5.878785
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:left;">
+Burkina Faso
+</td>
+<td style="text-align:right;">
+1485.88566
+</td>
+<td style="text-align:right;">
+0.491
+</td>
+<td style="text-align:right;">
+0.535
+</td>
+<td style="text-align:right;">
+62.2
+</td>
+<td style="text-align:right;">
+58.588463
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:left;">
+Madagascar
+</td>
+<td style="text-align:right;">
+1334.42488
+</td>
+<td style="text-align:right;">
+0.369
+</td>
+<td style="text-align:right;">
+0.357
+</td>
+<td style="text-align:right;">
+37.0
+</td>
+<td style="text-align:right;">
+65.856976
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:left;">
+Guinea
+</td>
+<td style="text-align:right;">
+1125.88617
+</td>
+<td style="text-align:right;">
+0.481
+</td>
+<td style="text-align:right;">
+0.459
+</td>
+<td style="text-align:right;">
+62.8
+</td>
+<td style="text-align:right;">
+58.733439
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:left;">
+Niger
+</td>
+<td style="text-align:right;">
+884.24400
+</td>
+<td style="text-align:right;">
+0.458
+</td>
+<td style="text-align:right;">
+0.605
+</td>
+<td style="text-align:right;">
+58.4
+</td>
+<td style="text-align:right;">
+61.458488
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:left;">
+Congo, Democratic Republic of the
+</td>
+<td style="text-align:right;">
+668.18765
+</td>
+<td style="text-align:right;">
+0.388
+</td>
+<td style="text-align:right;">
+0.401
+</td>
+<td style="text-align:right;">
+76.5
+</td>
+<td style="text-align:right;">
+58.659195
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:left;">
+Timor-Leste
+</td>
+<td style="text-align:right;">
+561.31743
+</td>
+<td style="text-align:right;">
+0.381
+</td>
+<td style="text-align:right;">
+0.360
+</td>
+<td style="text-align:right;">
+46.1
+</td>
+<td style="text-align:right;">
+68.259146
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:left;">
+Mozambique
+</td>
+<td style="text-align:right;">
+165.75573
+</td>
+<td style="text-align:right;">
+0.485
+</td>
+<td style="text-align:right;">
+0.389
+</td>
+<td style="text-align:right;">
+58.5
+</td>
+<td style="text-align:right;">
+55.259512
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:left;">
+Uganda
+</td>
+<td style="text-align:right;">
+163.95147
+</td>
+<td style="text-align:right;">
+0.558
+</td>
+<td style="text-align:right;">
+0.367
+</td>
+<td style="text-align:right;">
+39.1
+</td>
+<td style="text-align:right;">
+58.466415
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:left;">
+Gambia
+</td>
+<td style="text-align:right;">
+156.67591
+</td>
+<td style="text-align:right;">
+0.460
+</td>
+<td style="text-align:right;">
+0.323
+</td>
+<td style="text-align:right;">
+48.6
+</td>
+<td style="text-align:right;">
+6.228439
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:left;">
+Ethiopia
+</td>
+<td style="text-align:right;">
+142.36816
+</td>
+<td style="text-align:right;">
+0.578
+</td>
+<td style="text-align:right;">
+0.564
+</td>
+<td style="text-align:right;">
+42.9
+</td>
+<td style="text-align:right;">
+64.352439
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:left;">
+Togo
+</td>
+<td style="text-align:right;">
+113.97649
+</td>
+<td style="text-align:right;">
+0.372
+</td>
+<td style="text-align:right;">
+0.252
+</td>
+<td style="text-align:right;">
+53.6
+</td>
+<td style="text-align:right;">
+59.655849
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:left;">
+Burundi
+</td>
+<td style="text-align:right;">
+83.47420
+</td>
+<td style="text-align:right;">
+0.337
+</td>
+<td style="text-align:right;">
+0.454
+</td>
+<td style="text-align:right;">
+55.8
+</td>
+<td style="text-align:right;">
+56.692244
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:left;">
+Liberia
+</td>
+<td style="text-align:right;">
+71.58664
+</td>
+<td style="text-align:right;">
+0.286
+</td>
+<td style="text-align:right;">
+0.374
+</td>
+<td style="text-align:right;">
+54.7
+</td>
+<td style="text-align:right;">
+6.834415
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:left;">
+Central African Republic
+</td>
+<td style="text-align:right;">
+64.34622
+</td>
+<td style="text-align:right;">
+0.347
+</td>
+<td style="text-align:right;">
+0.430
+</td>
+<td style="text-align:right;">
+93.5
+</td>
+<td style="text-align:right;">
+5.657785
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><br> We can see that Nigeria has the highest GNI per capita, yet has an Extreme MPI Gap. Nigeria also has lower life expectancy than other countries with similar GNIs per capita (Pakistan and Sudan) <br><br> Let’s see look at Nigeria in detail. Here’s a view of its regional MPIs. <br></p>
+<pre class="r"><code>subnational %&gt;% 
+  filter(Country == &#39;Nigeria&#39;) %&gt;%
+  ggplot(mapping = aes(x = reorder(Sub_national_region, -MPI_Regional), y = MPI_Regional, fill = MPI_Regional)) +
+  geom_bar(stat = &#39;identity&#39;) +
+  theme_economist() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), axis.title.x=element_blank(), legend.position = &#39;none&#39;)</code></pre>
+<p><img src="/post/2019-08-25-exploring-oxford-mpi-data_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /> <br> As expected, agricultural regions account for the highest MPIs and Lagos has the lowest MPI score. This view points out something interesting: Lagos is one of the most developed cities in the Africa. The comparison between max MPI and min MPI may unfairly punish nations with economically strong cities. <br><br> To test this, let’s see where Lagos ranks in terms of all MPI regions in SSA. <br></p>
+<pre class="r"><code>sub &lt;- merge(subnational, Country_data[, c(&quot;Country_Code&quot;, &quot;Income_Group&quot;)], 
+             by.x=&#39;ISO_country_code&#39;, by.y = &#39;Country_Code&#39;)
+sub %&gt;% 
+  filter(World_region == &#39;Sub-Saharan Africa&#39;) %&gt;%
+  mutate(Rank = min_rank(MPI_Regional)) %&gt;% 
+  arrange(Rank) %&gt;% 
+  dplyr::select(Rank, Sub_national_region, Country, MPI_Regional, MPI_National) %&gt;%
+  filter(Rank &lt;= 10) %&gt;% 
+  kable() %&gt;% 
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = TRUE, position = &quot;center&quot;)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+Rank
+</th>
+<th style="text-align:left;">
+Sub_national_region
+</th>
+<th style="text-align:left;">
+Country
+</th>
+<th style="text-align:right;">
+MPI_Regional
+</th>
+<th style="text-align:right;">
+MPI_National
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Bulawayo
+</td>
+<td style="text-align:left;">
+Zimbabwe
+</td>
+<td style="text-align:right;">
+0.014
+</td>
+<td style="text-align:right;">
+0.152
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Nairobi
+</td>
+<td style="text-align:left;">
+Kenya
+</td>
+<td style="text-align:right;">
+0.020
+</td>
+<td style="text-align:right;">
+0.187
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Douala
+</td>
+<td style="text-align:left;">
+Cameroon
+</td>
+<td style="text-align:right;">
+0.024
+</td>
+<td style="text-align:right;">
+0.248
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Libreville/Port-Gentil
+</td>
+<td style="text-align:left;">
+Gabon
+</td>
+<td style="text-align:right;">
+0.024
+</td>
+<td style="text-align:right;">
+0.070
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+Yaoundð
+</td>
+<td style="text-align:left;">
+Cameroon
+</td>
+<td style="text-align:right;">
+0.026
+</td>
+<td style="text-align:right;">
+0.248
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+Mzuzu City
+</td>
+<td style="text-align:left;">
+Malawi
+</td>
+<td style="text-align:right;">
+0.034
+</td>
+<td style="text-align:right;">
+0.251
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:left;">
+Lagos
+</td>
+<td style="text-align:left;">
+Nigeria
+</td>
+<td style="text-align:right;">
+0.035
+</td>
+<td style="text-align:right;">
+0.303
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;">
+Harare
+</td>
+<td style="text-align:left;">
+Zimbabwe
+</td>
+<td style="text-align:right;">
+0.038
+</td>
+<td style="text-align:right;">
+0.152
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+Dakhlett Nouadibou
+</td>
+<td style="text-align:left;">
+Mauritania
+</td>
+<td style="text-align:right;">
+0.039
+</td>
+<td style="text-align:right;">
+0.285
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+Manzini
+</td>
+<td style="text-align:left;">
+Swaziland
+</td>
+<td style="text-align:right;">
+0.041
+</td>
+<td style="text-align:right;">
+0.066
+</td>
+</tr>
+</tbody>
+</table>
+<p>Lagos has one of the lowest MPI scores in all of SSA. Our previous comparison penalizes Nigeria for this economic prosperity. <br><br> We can handle this by comparing the maximum MPI region to the national average. Below, is a table that shows the gap between the country’s average and its lowest MPI. It also lists the highest and lowest MPI regions for reach country with MPIs over 0.4 or with regions that have MPIs over 0.4.</p>
+<pre class="r"><code>gaps &lt;- gaps %&gt;% mutate(MPI_Gap_Avg = MPI_National - Lowest_MPI)
+df &lt;- merge(gaps, WDI, by = &#39;ISO_country_code&#39;)
+df %&gt;% 
+  drop_na(GNI_Per_Capita_PPP) %&gt;% 
+  filter(MPI_National &gt; 0.4 | Highest_MPI &gt; 0.4) %&gt;% 
+  mutate(Rank = min_rank(-MPI_Gap_Avg)) %&gt;% 
+  arrange(Rank) %&gt;% 
+  dplyr::select(Rank, Country, MPI_Gap_Avg, Highest_MPI, Highest_Region, 
+         MPI_National, Lowest_MPI, Lowest_Region, MPI_Gap) %&gt;% 
+  kable() %&gt;% 
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = TRUE,
+                position = &quot;center&quot;, font_size = 10) %&gt;% 
+  scroll_box(height = &quot;250px&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:250px; ">
+<table class="table table-striped table-hover table-condensed" style="font-size: 10px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Rank
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Country
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+MPI_Gap_Avg
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Highest_MPI
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Highest_Region
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+MPI_National
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Lowest_MPI
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Lowest_Region
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+MPI_Gap
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Ethiopia
+</td>
+<td style="text-align:right;">
+0.479
+</td>
+<td style="text-align:right;">
+0.663
+</td>
+<td style="text-align:left;">
+Affar
+</td>
+<td style="text-align:right;">
+0.564
+</td>
+<td style="text-align:right;">
+0.085
+</td>
+<td style="text-align:left;">
+Addis Ababa
+</td>
+<td style="text-align:right;">
+0.578
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Niger
+</td>
+<td style="text-align:right;">
+0.399
+</td>
+<td style="text-align:right;">
+0.664
+</td>
+<td style="text-align:left;">
+Maradi
+</td>
+<td style="text-align:right;">
+0.605
+</td>
+<td style="text-align:right;">
+0.206
+</td>
+<td style="text-align:left;">
+Niamey
+</td>
+<td style="text-align:right;">
+0.458
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Mozambique
+</td>
+<td style="text-align:right;">
+0.346
+</td>
+<td style="text-align:right;">
+0.528
+</td>
+<td style="text-align:left;">
+Zambðzia
+</td>
+<td style="text-align:right;">
+0.389
+</td>
+<td style="text-align:right;">
+0.043
+</td>
+<td style="text-align:left;">
+Maputo Cidade
+</td>
+<td style="text-align:right;">
+0.485
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+Guinea
+</td>
+<td style="text-align:right;">
+0.337
+</td>
+<td style="text-align:right;">
+0.603
+</td>
+<td style="text-align:left;">
+Kankan
+</td>
+<td style="text-align:right;">
+0.459
+</td>
+<td style="text-align:right;">
+0.122
+</td>
+<td style="text-align:left;">
+Conakry
+</td>
+<td style="text-align:right;">
+0.481
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+Burkina Faso
+</td>
+<td style="text-align:right;">
+0.328
+</td>
+<td style="text-align:right;">
+0.698
+</td>
+<td style="text-align:left;">
+Est
+</td>
+<td style="text-align:right;">
+0.535
+</td>
+<td style="text-align:right;">
+0.207
+</td>
+<td style="text-align:left;">
+Centre
+</td>
+<td style="text-align:right;">
+0.491
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+Congo, Democratic Republic of the
+</td>
+<td style="text-align:right;">
+0.299
+</td>
+<td style="text-align:right;">
+0.490
+</td>
+<td style="text-align:left;">
+Kasað-Occidental
+</td>
+<td style="text-align:right;">
+0.401
+</td>
+<td style="text-align:right;">
+0.102
+</td>
+<td style="text-align:left;">
+Kinshasa
+</td>
+<td style="text-align:right;">
+0.388
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:left;">
+Chad
+</td>
+<td style="text-align:right;">
+0.295
+</td>
+<td style="text-align:right;">
+0.744
+</td>
+<td style="text-align:left;">
+Lac
+</td>
+<td style="text-align:right;">
+0.552
+</td>
+<td style="text-align:right;">
+0.257
+</td>
+<td style="text-align:left;">
+N’DjamðNa
+</td>
+<td style="text-align:right;">
+0.487
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;">
+Uganda
+</td>
+<td style="text-align:right;">
+0.291
+</td>
+<td style="text-align:right;">
+0.634
+</td>
+<td style="text-align:left;">
+Karamoja
+</td>
+<td style="text-align:right;">
+0.367
+</td>
+<td style="text-align:right;">
+0.076
+</td>
+<td style="text-align:left;">
+Kampala
+</td>
+<td style="text-align:right;">
+0.558
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+Burundi
+</td>
+<td style="text-align:right;">
+0.290
+</td>
+<td style="text-align:right;">
+0.501
+</td>
+<td style="text-align:left;">
+Nord
+</td>
+<td style="text-align:right;">
+0.454
+</td>
+<td style="text-align:right;">
+0.164
+</td>
+<td style="text-align:left;">
+Bujumbura Mairie
+</td>
+<td style="text-align:right;">
+0.337
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+Mali
+</td>
+<td style="text-align:right;">
+0.289
+</td>
+<td style="text-align:right;">
+0.594
+</td>
+<td style="text-align:left;">
+Mopti
+</td>
+<td style="text-align:right;">
+0.457
+</td>
+<td style="text-align:right;">
+0.168
+</td>
+<td style="text-align:left;">
+Bamako
+</td>
+<td style="text-align:right;">
+0.426
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:left;">
+Sierra Leone
+</td>
+<td style="text-align:right;">
+0.273
+</td>
+<td style="text-align:right;">
+0.601
+</td>
+<td style="text-align:left;">
+Koinadugu
+</td>
+<td style="text-align:right;">
+0.464
+</td>
+<td style="text-align:right;">
+0.191
+</td>
+<td style="text-align:left;">
+Western Urban
+</td>
+<td style="text-align:right;">
+0.410
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:left;">
+Nigeria
+</td>
+<td style="text-align:right;">
+0.268
+</td>
+<td style="text-align:right;">
+0.635
+</td>
+<td style="text-align:left;">
+Yobe
+</td>
+<td style="text-align:right;">
+0.303
+</td>
+<td style="text-align:right;">
+0.035
+</td>
+<td style="text-align:left;">
+Lagos
+</td>
+<td style="text-align:right;">
+0.600
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:left;">
+Mauritania
+</td>
+<td style="text-align:right;">
+0.246
+</td>
+<td style="text-align:right;">
+0.499
+</td>
+<td style="text-align:left;">
+Guidimagha
+</td>
+<td style="text-align:right;">
+0.285
+</td>
+<td style="text-align:right;">
+0.039
+</td>
+<td style="text-align:left;">
+Dakhlett Nouadibou
+</td>
+<td style="text-align:right;">
+0.460
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:left;">
+Sudan
+</td>
+<td style="text-align:right;">
+0.240
+</td>
+<td style="text-align:right;">
+0.501
+</td>
+<td style="text-align:left;">
+Central Darfor
+</td>
+<td style="text-align:right;">
+0.287
+</td>
+<td style="text-align:right;">
+0.047
+</td>
+<td style="text-align:left;">
+Northern
+</td>
+<td style="text-align:right;">
+0.454
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:left;">
+Central African Republic
+</td>
+<td style="text-align:right;">
+0.233
+</td>
+<td style="text-align:right;">
+0.544
+</td>
+<td style="text-align:left;">
+Basse-Kotto
+</td>
+<td style="text-align:right;">
+0.430
+</td>
+<td style="text-align:right;">
+0.197
+</td>
+<td style="text-align:left;">
+Bangui
+</td>
+<td style="text-align:right;">
+0.347
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:left;">
+Timor-Leste
+</td>
+<td style="text-align:right;">
+0.233
+</td>
+<td style="text-align:right;">
+0.508
+</td>
+<td style="text-align:left;">
+Oecussi
+</td>
+<td style="text-align:right;">
+0.360
+</td>
+<td style="text-align:right;">
+0.127
+</td>
+<td style="text-align:left;">
+Dili
+</td>
+<td style="text-align:right;">
+0.381
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:left;">
+Gambia
+</td>
+<td style="text-align:right;">
+0.228
+</td>
+<td style="text-align:right;">
+0.555
+</td>
+<td style="text-align:left;">
+Kuntaur
+</td>
+<td style="text-align:right;">
+0.323
+</td>
+<td style="text-align:right;">
+0.095
+</td>
+<td style="text-align:left;">
+Banjul
+</td>
+<td style="text-align:right;">
+0.460
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:left;">
+Cameroon
+</td>
+<td style="text-align:right;">
+0.224
+</td>
+<td style="text-align:right;">
+0.540
+</td>
+<td style="text-align:left;">
+Extrðme-Nord
+</td>
+<td style="text-align:right;">
+0.248
+</td>
+<td style="text-align:right;">
+0.024
+</td>
+<td style="text-align:left;">
+Douala
+</td>
+<td style="text-align:right;">
+0.516
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:left;">
+Benin
+</td>
+<td style="text-align:right;">
+0.224
+</td>
+<td style="text-align:right;">
+0.528
+</td>
+<td style="text-align:left;">
+Alibori
+</td>
+<td style="text-align:right;">
+0.307
+</td>
+<td style="text-align:right;">
+0.083
+</td>
+<td style="text-align:left;">
+Littoral
+</td>
+<td style="text-align:right;">
+0.445
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:left;">
+Cote d’Ivoire
+</td>
+<td style="text-align:right;">
+0.201
+</td>
+<td style="text-align:right;">
+0.518
+</td>
+<td style="text-align:left;">
+Nord-Ouest
+</td>
+<td style="text-align:right;">
+0.310
+</td>
+<td style="text-align:right;">
+0.109
+</td>
+<td style="text-align:left;">
+Ville d’Abidjan
+</td>
+<td style="text-align:right;">
+0.409
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:left;">
+Pakistan
+</td>
+<td style="text-align:right;">
+0.191
+</td>
+<td style="text-align:right;">
+0.402
+</td>
+<td style="text-align:left;">
+Balochistan
+</td>
+<td style="text-align:right;">
+0.230
+</td>
+<td style="text-align:right;">
+0.039
+</td>
+<td style="text-align:left;">
+Islamabad (ICT)
+</td>
+<td style="text-align:right;">
+0.363
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:left;">
+Togo
+</td>
+<td style="text-align:right;">
+0.185
+</td>
+<td style="text-align:right;">
+0.439
+</td>
+<td style="text-align:left;">
+Region des Savanes
+</td>
+<td style="text-align:right;">
+0.252
+</td>
+<td style="text-align:right;">
+0.067
+</td>
+<td style="text-align:left;">
+Commune de Lome
+</td>
+<td style="text-align:right;">
+0.372
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:left;">
+Madagascar
+</td>
+<td style="text-align:right;">
+0.179
+</td>
+<td style="text-align:right;">
+0.547
+</td>
+<td style="text-align:left;">
+Androy
+</td>
+<td style="text-align:right;">
+0.357
+</td>
+<td style="text-align:right;">
+0.178
+</td>
+<td style="text-align:left;">
+Analamanga
+</td>
+<td style="text-align:right;">
+0.369
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:left;">
+Senegal
+</td>
+<td style="text-align:right;">
+0.175
+</td>
+<td style="text-align:right;">
+0.449
+</td>
+<td style="text-align:left;">
+Center
+</td>
+<td style="text-align:right;">
+0.331
+</td>
+<td style="text-align:right;">
+0.156
+</td>
+<td style="text-align:left;">
+Ouest
+</td>
+<td style="text-align:right;">
+0.293
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:left;">
+Kenya
+</td>
+<td style="text-align:right;">
+0.167
+</td>
+<td style="text-align:right;">
+0.509
+</td>
+<td style="text-align:left;">
+North Eastern
+</td>
+<td style="text-align:right;">
+0.187
+</td>
+<td style="text-align:right;">
+0.020
+</td>
+<td style="text-align:left;">
+Nairobi
+</td>
+<td style="text-align:right;">
+0.489
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:left;">
+South Sudan
+</td>
+<td style="text-align:right;">
+0.166
+</td>
+<td style="text-align:right;">
+0.661
+</td>
+<td style="text-align:left;">
+Warap
+</td>
+<td style="text-align:right;">
+0.557
+</td>
+<td style="text-align:right;">
+0.391
+</td>
+<td style="text-align:left;">
+Central Equatoria
+</td>
+<td style="text-align:right;">
+0.270
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:left;">
+Liberia
+</td>
+<td style="text-align:right;">
+0.124
+</td>
+<td style="text-align:right;">
+0.536
+</td>
+<td style="text-align:left;">
+River Cess
+</td>
+<td style="text-align:right;">
+0.374
+</td>
+<td style="text-align:right;">
+0.250
+</td>
+<td style="text-align:left;">
+Montserrado
+</td>
+<td style="text-align:right;">
+0.286
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><br> Here we can see that the impact of Lagos on Nigeria’s rank is minimized. Additionally, Ethiopia and Mozambique stand out as having extremely high MPI regions versus the average, indicating extreme disparity between those living in Addis Ababa/Maputo and those not. <br><br> Let’s examine the regions of Ethiopia and Mozambique to see this. First, here’s a plot of the MPIs of Ethiopia’s regions. <br></p>
+<pre class="r"><code>subnational %&gt;% 
+  filter(Country == &#39;Ethiopia&#39;) %&gt;%
+  ggplot(mapping = aes(x = reorder(Sub_national_region, -MPI_Regional), y = MPI_Regional, fill = MPI_National)) + 
+  geom_bar(stat = &#39;identity&#39;) +
+  theme_economist() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), axis.title.x=element_blank(), legend.position = &#39;none&#39;)</code></pre>
+<p><img src="/post/2019-08-25-exploring-oxford-mpi-data_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /> <br> Now, here’s a plot of the MPIs of Mozambique’s regions. <br></p>
+<pre class="r"><code>subnational %&gt;% 
+  filter(Country == &#39;Mozambique&#39;) %&gt;%
+  ggplot(mapping = aes(x = reorder(Sub_national_region, -MPI_Regional), y = MPI_Regional, fill = MPI_National)) + 
+  geom_bar(stat = &#39;identity&#39;) +
+  theme_economist() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), axis.title.x=element_blank(), legend.position = &#39;none&#39;)</code></pre>
+<p><img src="/post/2019-08-25-exploring-oxford-mpi-data_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /> <br> In both countries, we can see that there is dramatic disparity between the lowest MPIs and the average MPIs in the remaining regions. <br><br> I’d like to contextualize the severity of these differences by looking at countries where the difference between the 1st and 2nd lowest MPIs is the greatest. This jump should further highlight countries where wealth and development is highly concentrated. Below is a table of countries ranked by the jump between their highest region and their lowest region.</p>
+<pre class="r"><code>sub &lt;- subnational %&gt;% 
+  group_by(Country) %&gt;% 
+  mutate(ranks = order(order(MPI_Regional))) %&gt;% 
+  arrange(Country, ranks) %&gt;% 
+  mutate(lag_MPI = MPI_Regional - lag(MPI_Regional)) %&gt;% 
+  filter(ranks == 2)
+df &lt;- merge(df, sub[, c(&#39;ISO_country_code&#39;, &#39;lag_MPI&#39;)], by = &#39;ISO_country_code&#39;) %&gt;% 
+  rename(MPI_Jump = lag_MPI)
+df %&gt;% 
+  drop_na(GNI_Per_Capita_PPP) %&gt;% 
+  filter(MPI_National &gt; 0.4 | Highest_MPI &gt; 0.4) %&gt;% 
+  mutate(Rank = min_rank(-MPI_Jump)) %&gt;% 
+  arrange(Rank) %&gt;% 
+  dplyr::select(Rank, Country, MPI_Jump, MPI_Gap_Avg, Highest_MPI, Highest_Region, 
+         MPI_National, Lowest_MPI, Lowest_Region) %&gt;% 
+  kable() %&gt;% 
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = TRUE,
+                position = &quot;center&quot;, font_size = 10) %&gt;% 
+  scroll_box(height = &quot;250px&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:250px; ">
+<table class="table table-striped table-hover table-condensed" style="font-size: 10px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Rank
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Country
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+MPI_Jump
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+MPI_Gap_Avg
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Highest_MPI
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Highest_Region
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+MPI_National
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Lowest_MPI
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Lowest_Region
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Guinea
+</td>
+<td style="text-align:right;">
+0.296
+</td>
+<td style="text-align:right;">
+0.337
+</td>
+<td style="text-align:right;">
+0.603
+</td>
+<td style="text-align:left;">
+Kankan
+</td>
+<td style="text-align:right;">
+0.459
+</td>
+<td style="text-align:right;">
+0.122
+</td>
+<td style="text-align:left;">
+Conakry
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Mali
+</td>
+<td style="text-align:right;">
+0.272
+</td>
+<td style="text-align:right;">
+0.289
+</td>
+<td style="text-align:right;">
+0.594
+</td>
+<td style="text-align:left;">
+Mopti
+</td>
+<td style="text-align:right;">
+0.457
+</td>
+<td style="text-align:right;">
+0.168
+</td>
+<td style="text-align:left;">
+Bamako
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Burundi
+</td>
+<td style="text-align:right;">
+0.258
+</td>
+<td style="text-align:right;">
+0.290
+</td>
+<td style="text-align:right;">
+0.501
+</td>
+<td style="text-align:left;">
+Nord
+</td>
+<td style="text-align:right;">
+0.454
+</td>
+<td style="text-align:right;">
+0.164
+</td>
+<td style="text-align:left;">
+Bujumbura Mairie
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+Burkina Faso
+</td>
+<td style="text-align:right;">
+0.252
+</td>
+<td style="text-align:right;">
+0.328
+</td>
+<td style="text-align:right;">
+0.698
+</td>
+<td style="text-align:left;">
+Est
+</td>
+<td style="text-align:right;">
+0.535
+</td>
+<td style="text-align:right;">
+0.207
+</td>
+<td style="text-align:left;">
+Centre
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+Ethiopia
+</td>
+<td style="text-align:right;">
+0.248
+</td>
+<td style="text-align:right;">
+0.479
+</td>
+<td style="text-align:right;">
+0.663
+</td>
+<td style="text-align:left;">
+Affar
+</td>
+<td style="text-align:right;">
+0.564
+</td>
+<td style="text-align:right;">
+0.085
+</td>
+<td style="text-align:left;">
+Addis Ababa
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+Congo, Democratic Republic of the
+</td>
+<td style="text-align:right;">
+0.247
+</td>
+<td style="text-align:right;">
+0.299
+</td>
+<td style="text-align:right;">
+0.490
+</td>
+<td style="text-align:left;">
+Kasað-Occidental
+</td>
+<td style="text-align:right;">
+0.401
+</td>
+<td style="text-align:right;">
+0.102
+</td>
+<td style="text-align:left;">
+Kinshasa
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:left;">
+Uganda
+</td>
+<td style="text-align:right;">
+0.218
+</td>
+<td style="text-align:right;">
+0.291
+</td>
+<td style="text-align:right;">
+0.634
+</td>
+<td style="text-align:left;">
+Karamoja
+</td>
+<td style="text-align:right;">
+0.367
+</td>
+<td style="text-align:right;">
+0.076
+</td>
+<td style="text-align:left;">
+Kampala
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;">
+Senegal
+</td>
+<td style="text-align:right;">
+0.217
+</td>
+<td style="text-align:right;">
+0.175
+</td>
+<td style="text-align:right;">
+0.449
+</td>
+<td style="text-align:left;">
+Center
+</td>
+<td style="text-align:right;">
+0.331
+</td>
+<td style="text-align:right;">
+0.156
+</td>
+<td style="text-align:left;">
+Ouest
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+Niger
+</td>
+<td style="text-align:right;">
+0.199
+</td>
+<td style="text-align:right;">
+0.399
+</td>
+<td style="text-align:right;">
+0.664
+</td>
+<td style="text-align:left;">
+Maradi
+</td>
+<td style="text-align:right;">
+0.605
+</td>
+<td style="text-align:right;">
+0.206
+</td>
+<td style="text-align:left;">
+Niamey
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+Togo
+</td>
+<td style="text-align:right;">
+0.169
+</td>
+<td style="text-align:right;">
+0.185
+</td>
+<td style="text-align:right;">
+0.439
+</td>
+<td style="text-align:left;">
+Region des Savanes
+</td>
+<td style="text-align:right;">
+0.252
+</td>
+<td style="text-align:right;">
+0.067
+</td>
+<td style="text-align:left;">
+Commune de Lome
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:left;">
+Timor-Leste
+</td>
+<td style="text-align:right;">
+0.168
+</td>
+<td style="text-align:right;">
+0.233
+</td>
+<td style="text-align:right;">
+0.508
+</td>
+<td style="text-align:left;">
+Oecussi
+</td>
+<td style="text-align:right;">
+0.360
+</td>
+<td style="text-align:right;">
+0.127
+</td>
+<td style="text-align:left;">
+Dili
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:left;">
+Central African Republic
+</td>
+<td style="text-align:right;">
+0.167
+</td>
+<td style="text-align:right;">
+0.233
+</td>
+<td style="text-align:right;">
+0.544
+</td>
+<td style="text-align:left;">
+Basse-Kotto
+</td>
+<td style="text-align:right;">
+0.430
+</td>
+<td style="text-align:right;">
+0.197
+</td>
+<td style="text-align:left;">
+Bangui
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:left;">
+Cote d’Ivoire
+</td>
+<td style="text-align:right;">
+0.155
+</td>
+<td style="text-align:right;">
+0.201
+</td>
+<td style="text-align:right;">
+0.518
+</td>
+<td style="text-align:left;">
+Nord-Ouest
+</td>
+<td style="text-align:right;">
+0.310
+</td>
+<td style="text-align:right;">
+0.109
+</td>
+<td style="text-align:left;">
+Ville d’Abidjan
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:left;">
+Benin
+</td>
+<td style="text-align:right;">
+0.155
+</td>
+<td style="text-align:right;">
+0.224
+</td>
+<td style="text-align:right;">
+0.528
+</td>
+<td style="text-align:left;">
+Alibori
+</td>
+<td style="text-align:right;">
+0.307
+</td>
+<td style="text-align:right;">
+0.083
+</td>
+<td style="text-align:left;">
+Littoral
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:left;">
+Chad
+</td>
+<td style="text-align:right;">
+0.154
+</td>
+<td style="text-align:right;">
+0.295
+</td>
+<td style="text-align:right;">
+0.744
+</td>
+<td style="text-align:left;">
+Lac
+</td>
+<td style="text-align:right;">
+0.552
+</td>
+<td style="text-align:right;">
+0.257
+</td>
+<td style="text-align:left;">
+N’DjamðNa
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:left;">
+Pakistan
+</td>
+<td style="text-align:right;">
+0.145
+</td>
+<td style="text-align:right;">
+0.191
+</td>
+<td style="text-align:right;">
+0.402
+</td>
+<td style="text-align:left;">
+Balochistan
+</td>
+<td style="text-align:right;">
+0.230
+</td>
+<td style="text-align:right;">
+0.039
+</td>
+<td style="text-align:left;">
+Islamabad (ICT)
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:left;">
+Sierra Leone
+</td>
+<td style="text-align:right;">
+0.128
+</td>
+<td style="text-align:right;">
+0.273
+</td>
+<td style="text-align:right;">
+0.601
+</td>
+<td style="text-align:left;">
+Koinadugu
+</td>
+<td style="text-align:right;">
+0.464
+</td>
+<td style="text-align:right;">
+0.191
+</td>
+<td style="text-align:left;">
+Western Urban
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:left;">
+Liberia
+</td>
+<td style="text-align:right;">
+0.099
+</td>
+<td style="text-align:right;">
+0.124
+</td>
+<td style="text-align:right;">
+0.536
+</td>
+<td style="text-align:left;">
+River Cess
+</td>
+<td style="text-align:right;">
+0.374
+</td>
+<td style="text-align:right;">
+0.250
+</td>
+<td style="text-align:left;">
+Montserrado
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:left;">
+Madagascar
+</td>
+<td style="text-align:right;">
+0.091
+</td>
+<td style="text-align:right;">
+0.179
+</td>
+<td style="text-align:right;">
+0.547
+</td>
+<td style="text-align:left;">
+Androy
+</td>
+<td style="text-align:right;">
+0.357
+</td>
+<td style="text-align:right;">
+0.178
+</td>
+<td style="text-align:left;">
+Analamanga
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:left;">
+Mozambique
+</td>
+<td style="text-align:right;">
+0.090
+</td>
+<td style="text-align:right;">
+0.346
+</td>
+<td style="text-align:right;">
+0.528
+</td>
+<td style="text-align:left;">
+Zambðzia
+</td>
+<td style="text-align:right;">
+0.389
+</td>
+<td style="text-align:right;">
+0.043
+</td>
+<td style="text-align:left;">
+Maputo Cidade
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:left;">
+South Sudan
+</td>
+<td style="text-align:right;">
+0.065
+</td>
+<td style="text-align:right;">
+0.166
+</td>
+<td style="text-align:right;">
+0.661
+</td>
+<td style="text-align:left;">
+Warap
+</td>
+<td style="text-align:right;">
+0.557
+</td>
+<td style="text-align:right;">
+0.391
+</td>
+<td style="text-align:left;">
+Central Equatoria
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:left;">
+Gambia
+</td>
+<td style="text-align:right;">
+0.062
+</td>
+<td style="text-align:right;">
+0.228
+</td>
+<td style="text-align:right;">
+0.555
+</td>
+<td style="text-align:left;">
+Kuntaur
+</td>
+<td style="text-align:right;">
+0.323
+</td>
+<td style="text-align:right;">
+0.095
+</td>
+<td style="text-align:left;">
+Banjul
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:left;">
+Kenya
+</td>
+<td style="text-align:right;">
+0.055
+</td>
+<td style="text-align:right;">
+0.167
+</td>
+<td style="text-align:right;">
+0.509
+</td>
+<td style="text-align:left;">
+North Eastern
+</td>
+<td style="text-align:right;">
+0.187
+</td>
+<td style="text-align:right;">
+0.020
+</td>
+<td style="text-align:left;">
+Nairobi
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:left;">
+Mauritania
+</td>
+<td style="text-align:right;">
+0.046
+</td>
+<td style="text-align:right;">
+0.246
+</td>
+<td style="text-align:right;">
+0.499
+</td>
+<td style="text-align:left;">
+Guidimagha
+</td>
+<td style="text-align:right;">
+0.285
+</td>
+<td style="text-align:right;">
+0.039
+</td>
+<td style="text-align:left;">
+Dakhlett Nouadibou
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:left;">
+Sudan
+</td>
+<td style="text-align:right;">
+0.030
+</td>
+<td style="text-align:right;">
+0.240
+</td>
+<td style="text-align:right;">
+0.501
+</td>
+<td style="text-align:left;">
+Central Darfor
+</td>
+<td style="text-align:right;">
+0.287
+</td>
+<td style="text-align:right;">
+0.047
+</td>
+<td style="text-align:left;">
+Northern
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:left;">
+Nigeria
+</td>
+<td style="text-align:right;">
+0.008
+</td>
+<td style="text-align:right;">
+0.268
+</td>
+<td style="text-align:right;">
+0.635
+</td>
+<td style="text-align:left;">
+Yobe
+</td>
+<td style="text-align:right;">
+0.303
+</td>
+<td style="text-align:right;">
+0.035
+</td>
+<td style="text-align:left;">
+Lagos
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:left;">
+Cameroon
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:right;">
+0.224
+</td>
+<td style="text-align:right;">
+0.540
+</td>
+<td style="text-align:left;">
+Extrðme-Nord
+</td>
+<td style="text-align:right;">
+0.248
+</td>
+<td style="text-align:right;">
+0.024
+</td>
+<td style="text-align:left;">
+Douala
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><br> In these countries, one urban area is dramatically more developed than all other regions. Such a drop could indicate rural neglect, corruption, or localized industry. <br></p>
+</div>
+<div id="conclusion" class="section level3">
+<h3>Conclusion</h3>
+<p>Ultimately, this analysis has shown that there are significant intra- and intercountry differences in poverty. This underscores that poverty must not be considered simply a national battle. Poverty reduction relies on understanding regional differences and working with local actors to plan interventions. As Robert Chambers <a href="https://doi.org/10.1177/095624789500700106">(1995)</a> describes, this process relies on development practitioners listening to local realities and shifting accountability out of development centers.</p>
+</div>
+
+		</div></div>
+	<div class="footer wrapper">
+	<nav class="nav">
+		<div><a href="https://github.com/vividvilla/ezhil">Ezhil theme</a> | Built with <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
+</div>
+
+<script>feather.replace()</script>
+</body>
+</html>

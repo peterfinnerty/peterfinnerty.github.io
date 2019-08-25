@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Data on Peter Finnerty</title>
+    <link>/tags/data/</link>
+    <description>Recent content in Data on Peter Finnerty</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 25 Aug 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/data/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Oxford MPI Data</title>
+      <link>/post/exploring-oxford-mpi-data/</link>
+      <pubDate>Sun, 25 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/exploring-oxford-mpi-data/</guid>
+      <description>MPI Background MPI scores represent the best operationalized non-income based approach to measuring poverty. It measures acute poverty, including those who are poor due to absolute deprivation in one necessity and those who experience multiple forms of deprivation that result in poverty. This approach captures the spirit of Amartya Sen’s idea of shifting from income-based poverty metrics to a capabilities understanding of poverty and deprivation. For an overview of the issues with income-based poverty metrics and the importance of other measures, see Laderchi, Saith, and Stewart (2003).</description>
+    </item>
+    
+  </channel>
+</rss>
